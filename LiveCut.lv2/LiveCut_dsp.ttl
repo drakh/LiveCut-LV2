@@ -1,0 +1,472 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix mod:   <http://moddevices.com/ns/mod#> .
+@prefix opts:  <http://lv2plug.in/ns/ext/options#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
+@prefix patch: <http://lv2plug.in/ns/ext/patch#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rsz:   <http://lv2plug.in/ns/ext/resize-port#> .
+@prefix spdx:  <http://spdx.org/rdf/terms#> .
+@prefix unit:  <http://lv2plug.in/ns/extensions/units#> .
+
+<https://github.com/eventual-recluse/LiveCut>
+    a lv2:DelayPlugin, lv2:Plugin, doap:Project ;
+
+    lv2:extensionData opts:interface ;
+
+    lv2:optionalFeature <http://lv2plug.in/ns/ext/buf-size#boundedBlockLength> ;
+
+    lv2:requiredFeature opts:options ,
+                        <http://lv2plug.in/ns/ext/urid#map> ;
+
+    opts:supportedOption <http://lv2plug.in/ns/ext/buf-size#nominalBlockLength> ,
+                         <http://lv2plug.in/ns/ext/buf-size#maxBlockLength> ,
+                         <http://lv2plug.in/ns/ext/parameters#sampleRate> ;
+
+    lv2:port [
+        a lv2:InputPort, lv2:AudioPort ;
+        lv2:index 0 ;
+        lv2:symbol "lv2_audio_in_1" ;
+        lv2:name "Audio Input 1" ;
+        pg:group <https://github.com/eventual-recluse/LiveCut#portGroup_dpf_stereo> ;
+        lv2:designation pg:left ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:AudioPort ;
+        lv2:index 1 ;
+        lv2:symbol "lv2_audio_in_2" ;
+        lv2:name "Audio Input 2" ;
+        pg:group <https://github.com/eventual-recluse/LiveCut#portGroup_dpf_stereo> ;
+        lv2:designation pg:right ;
+    ] ;
+
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 2 ;
+        lv2:symbol "lv2_audio_out_1" ;
+        lv2:name "Audio Output 1" ;
+        pg:group <https://github.com/eventual-recluse/LiveCut#portGroup_dpf_stereo> ;
+        lv2:designation pg:left ;
+    ] ,
+    [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 3 ;
+        lv2:symbol "lv2_audio_out_2" ;
+        lv2:name "Audio Output 2" ;
+        pg:group <https://github.com/eventual-recluse/LiveCut#portGroup_dpf_stereo> ;
+        lv2:designation pg:right ;
+    ] ;
+
+    lv2:port [
+        a lv2:InputPort, atom:AtomPort ;
+        lv2:index 4 ;
+        lv2:name "Events Input" ;
+        lv2:symbol "lv2_events_in" ;
+        rsz:minimumSize 2048 ;
+        atom:bufferType atom:Sequence ;
+        atom:supports <http://lv2plug.in/ns/ext/time#Position> ;
+    ] ;
+
+    lv2:port [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 5 ;
+        lv2:name "CutProc" ;
+        lv2:symbol "livecut_cutproc" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 2 ;
+        lv2:portProperty lv2:enumeration ;
+        lv2:scalePoint [
+            rdfs:label  "CutProc11" ;
+            rdf:value 0 ;
+        ] ,
+        [
+            rdfs:label  "WarpCut" ;
+            rdf:value 1 ;
+        ] ,
+        [
+            rdfs:label  "SQPusher" ;
+            rdf:value 2 ;
+        ] ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 6 ;
+        lv2:name "SubDiv" ;
+        lv2:symbol "livecut_subdiv" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 6 ;
+        lv2:portProperty lv2:enumeration ;
+        lv2:scalePoint [
+            rdfs:label  "6" ;
+            rdf:value 0 ;
+        ] ,
+        [
+            rdfs:label  "8" ;
+            rdf:value 1 ;
+        ] ,
+        [
+            rdfs:label  "12" ;
+            rdf:value 2 ;
+        ] ,
+        [
+            rdfs:label  "16" ;
+            rdf:value 3 ;
+        ] ,
+        [
+            rdfs:label  "18" ;
+            rdf:value 4 ;
+        ] ,
+        [
+            rdfs:label  "24" ;
+            rdf:value 5 ;
+        ] ,
+        [
+            rdfs:label  "32" ;
+            rdf:value 6 ;
+        ] ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 7 ;
+        lv2:name "Fade" ;
+        lv2:symbol "livecut_fade" ;
+        lv2:default 0.00999999977648 ;
+        lv2:minimum 0.0001 ;
+        lv2:maximum 100 ;
+        unit:unit unit:ms ;
+        lv2:portProperty <http://lv2plug.in/ns/ext/port-props#logarithmic> ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 8 ;
+        lv2:name "Min Amp" ;
+        lv2:symbol "livecut_minamp" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 9 ;
+        lv2:name "Max Amp" ;
+        lv2:symbol "livecut_maxamp" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 10 ;
+        lv2:name "Min Pan" ;
+        lv2:symbol "livecut_minpan" ;
+        lv2:default -0.20000000298 ;
+        lv2:minimum -1 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 11 ;
+        lv2:name "Max Pan" ;
+        lv2:symbol "livecut_maxpan" ;
+        lv2:default 0.20000000298 ;
+        lv2:minimum -1 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 12 ;
+        lv2:name "Min Pitch" ;
+        lv2:symbol "livecut_minpitch" ;
+        lv2:default 0 ;
+        lv2:minimum -2400 ;
+        lv2:maximum 2400 ;
+        unit:unit [
+            a unit:Unit ;
+            rdfs:label  "cents" ;
+            unit:symbol "cents" ;
+            unit:render "%f cents" ;
+        ] ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 13 ;
+        lv2:name "Max Pitch" ;
+        lv2:symbol "livecut_maxpitch" ;
+        lv2:default 0 ;
+        lv2:minimum -2400 ;
+        lv2:maximum 2400 ;
+        unit:unit [
+            a unit:Unit ;
+            rdfs:label  "cents" ;
+            unit:symbol "cents" ;
+            unit:render "%f cents" ;
+        ] ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 14 ;
+        lv2:name "Duty" ;
+        lv2:symbol "livecut_duty" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 15 ;
+        lv2:name "Fill Duty" ;
+        lv2:symbol "livecut_fillduty" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 16 ;
+        lv2:name "Max Phrase" ;
+        lv2:symbol "livecut_maxphrs" ;
+        lv2:default 4 ;
+        lv2:minimum 1 ;
+        lv2:maximum 8 ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 17 ;
+        lv2:name "Min Phrase" ;
+        lv2:symbol "livecut_minphrs" ;
+        lv2:default 1 ;
+        lv2:minimum 1 ;
+        lv2:maximum 8 ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 18 ;
+        lv2:name "CutProc11 Max Rep" ;
+        lv2:symbol "livecut_maxrep" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 4 ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 19 ;
+        lv2:name "CutProc11 Min Rep" ;
+        lv2:symbol "livecut_minrep" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 4 ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 20 ;
+        lv2:name "CutProc 11 Stutter" ;
+        lv2:symbol "livecut_stutter" ;
+        lv2:default 0.800000011921 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 21 ;
+        lv2:name "CutProc 11 Area" ;
+        lv2:symbol "livecut_area" ;
+        lv2:default 0.5 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 22 ;
+        lv2:name "WarpCut Straight" ;
+        lv2:symbol "livecut_straight" ;
+        lv2:default 0.300000011921 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 23 ;
+        lv2:name "WarpCut Regular" ;
+        lv2:symbol "livecut_regular" ;
+        lv2:default 0.5 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 24 ;
+        lv2:name "WarpCut Ritard" ;
+        lv2:symbol "livecut_ritard" ;
+        lv2:default 0.5 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 25 ;
+        lv2:name "WarpCut Speed" ;
+        lv2:symbol "livecut_speed" ;
+        lv2:default 0.899999976158 ;
+        lv2:minimum 0.5 ;
+        lv2:maximum 0.999000012875 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 26 ;
+        lv2:name "SQPusher Activity" ;
+        lv2:symbol "livecut_activity" ;
+        lv2:default 0.5 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 27 ;
+        lv2:name "Crusher" ;
+        lv2:symbol "livecut_crusher" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 28 ;
+        lv2:name "Crusher Min Bits" ;
+        lv2:symbol "livecut_minbits" ;
+        lv2:default 32 ;
+        lv2:minimum 1 ;
+        lv2:maximum 32 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 29 ;
+        lv2:name "Crusher Max Bits" ;
+        lv2:symbol "livecut_maxbits" ;
+        lv2:default 32 ;
+        lv2:minimum 1 ;
+        lv2:maximum 32 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 30 ;
+        lv2:name "Crusher Min Freq" ;
+        lv2:symbol "livecut_minfreq" ;
+        lv2:default 44100 ;
+        lv2:minimum 441 ;
+        lv2:maximum 44100 ;
+        unit:unit unit:hz ;
+        lv2:portProperty <http://lv2plug.in/ns/ext/port-props#logarithmic> ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 31 ;
+        lv2:name "Crusher Max Freq" ;
+        lv2:symbol "livecut_maxfreq" ;
+        lv2:default 44100 ;
+        lv2:minimum 441 ;
+        lv2:maximum 44100 ;
+        unit:unit unit:hz ;
+        lv2:portProperty <http://lv2plug.in/ns/ext/port-props#logarithmic> ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 32 ;
+        lv2:name "Comb" ;
+        lv2:symbol "livecut_comb" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 33 ;
+        lv2:name "Comb Type" ;
+        lv2:symbol "livecut_type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:enumeration ;
+        lv2:scalePoint [
+            rdfs:label  "FeedFwd" ;
+            rdf:value 0 ;
+        ] ,
+        [
+            rdfs:label  "FeedBack" ;
+            rdf:value 1 ;
+        ] ;
+        lv2:portProperty lv2:integer ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 34 ;
+        lv2:name "Comb Feedback" ;
+        lv2:symbol "livecut_feedback" ;
+        lv2:default 0.5 ;
+        lv2:minimum 0 ;
+        lv2:maximum 0.899999976158 ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 35 ;
+        lv2:name "Comb Min Delay" ;
+        lv2:symbol "livecut_mindelay" ;
+        lv2:default 10 ;
+        lv2:minimum 1 ;
+        lv2:maximum 50 ;
+        unit:unit unit:ms ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 36 ;
+        lv2:name "Comb Max Delay" ;
+        lv2:symbol "livecut_maxdelay" ;
+        lv2:default 10 ;
+        lv2:minimum 1 ;
+        lv2:maximum 50 ;
+        unit:unit unit:ms ;
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 37 ;
+        lv2:name "Seed" ;
+        lv2:symbol "livecut_seed" ;
+        lv2:default 1 ;
+        lv2:minimum 1 ;
+        lv2:maximum 16 ;
+        lv2:portProperty lv2:integer ;
+    ] ;
+
+    rdfs:comment "Beat-slicer" ;
+
+    mod:brand "eventual-recluse" ;
+    mod:label "LiveCut" ;
+
+    doap:name "LiveCut" ;
+    doap:license <http://opensource.org/licenses/gpl-license> ;
+
+    doap:maintainer [
+        foaf:name "eventual-recluse" ;
+        foaf:homepage <https://github.com/eventual-recluse/LiveCut> ;
+    ] ;
+
+    lv2:microVersion 0 ;
+    lv2:minorVersion 2 .
+
+<https://github.com/eventual-recluse/LiveCut#portGroup_dpf_stereo>
+    a pg:Group , pg:StereoGroup ;
+    lv2:name "Stereo" ;
+    lv2:symbol "dpf_stereo" .
