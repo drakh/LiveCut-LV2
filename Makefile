@@ -1,52 +1,23 @@
 #!/usr/bin/make -f
-# Makefile for DPF #
-# ---------------- #
+# Makefile for LiveCut #
+# ---------------------------- #
 # Created by falkTX
 #
 
 include dpf/Makefile.base.mk
 
-all: dgl plugins gen
+all: plugins
 
 # --------------------------------------------------------------
 
-ifneq ($(CROSS_COMPILING),true)
-CAN_GENERATE_TTL = true
-else ifneq ($(EXE_WRAPPER),)
-CAN_GENERATE_TTL = true
-endif
-
-dgl:
-ifeq ($(HAVE_DGL),true)
-	$(MAKE) -C dpf/dgl opengl FILE_BROWSER_DISABLED=true
-endif
-
-plugins: dgl
-	$(MAKE) all -C plugins/LiveCut
-
-ifeq ($(CAN_GENERATE_TTL),true)
-gen: plugins dpf/utils/lv2_ttl_generator
-	@$(CURDIR)/dpf/utils/generate-ttl.sh
-
-dpf/utils/lv2_ttl_generator:
-	$(MAKE) -C dpf/utils/lv2-ttl-generator
-else
-gen:
-endif
-
-tests: dgl
-	$(MAKE) -C tests
+plugins:
+	$(MAKE) all -C ./plugins/LiveCut
 
 # --------------------------------------------------------------
 
-clean:
-	$(MAKE) clean -C dpf/dgl
-	$(MAKE) clean -C plugins/LiveCut
-	$(MAKE) clean -C dpf/utils/lv2-ttl-generator
-	rm -f dpf-widgets/opengl/*.d
-	rm -f dpf-widgets/opengl/*.o
-	rm -rf bin build
+install:
+	install -d $(DESTDIR)$(PREFIX)/lib/lv2/
+	cp -rL bin/*.lv2  $(DESTDIR)$(PREFIX)/lib/lv2/
 
 # --------------------------------------------------------------
-
-.PHONY: dgl plugins tests
+.PHONY: plugins
