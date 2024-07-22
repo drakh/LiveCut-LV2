@@ -37,9 +37,9 @@
 
 #include "DistrhoPlugin.hpp"
 #include "LiveCutControls.hpp"
-#include "BBCutter.h"
-#include "BitCrusher.h"
-#include "Comb.h"
+#include "lib/BBCutter.h"
+#include "lib/BitCrusher.h"
+#include "lib/Comb.h"
 
 START_NAMESPACE_DISTRHO
 
